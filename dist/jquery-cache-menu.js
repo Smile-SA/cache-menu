@@ -1,4 +1,4 @@
-/*! jquery-cache-menu - v1.0.0 - 2014-11-10 */
+/*! jquery-cache-menu - v1.0.1 */
 /*\
 |*|
 |*|  :: cookies.js ::

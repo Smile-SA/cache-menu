@@ -47,7 +47,7 @@ module.exports = function (grunt) {
 		src : 'src'
 	};
 
-	var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n';
+	var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */\n';
 
 	// Define the configuration for all the tasks
 	grunt.initConfig({

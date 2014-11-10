@@ -5,6 +5,7 @@
 This is a common issue with e-commerce websites that used to have the whole catalog into their menus ...
 The idea is to lighten webpage serve by the application by removing all the menu data that is hidden from user by default (only displayed to user after hovering on a menu for example).
 
+
 ## Theory
 
 ### Advantages
@@ -62,6 +63,7 @@ We want a plugin that :
 * allows a way to set specific behavior on the menu 
 
 Of course, all of this, without modifying the plugin itself =)
+
 
 ## Example flow with Manutan
 
@@ -190,3 +192,24 @@ Then, you'll need to trigger the 'menu-initialization-todo' event.
 ```
 
 Once initialization is done, the plugin will trigger the 'menu-initialization-done' event.
+
+
+## How to build the source
+
+### Test development
+
+```
+grunt serve
+```
+
+### Build project
+
+```
+grunt
+```
+
+### Release a new version
+
+```
+grunt bump
+```

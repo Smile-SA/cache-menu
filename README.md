@@ -1,6 +1,6 @@
 # jquery-cache-menu
 
-> This plugins aims to reduce html data transfered between client and server on recurring page call (while browsing a site).
+> This plugins aims to reduce html data transfered between client and server on recurring page calls (while browsing a site).
 
 This is a common issue with e-commerce websites that used to have the whole catalog into their menus ...
 The idea is to lighten webpage serve by the application by removing all the menu data that is hidden from user by default (only displayed to user after hovering on a menu for example).

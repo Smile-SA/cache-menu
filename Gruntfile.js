@@ -47,10 +47,13 @@ module.exports = function (grunt) {
 		src : 'src'
 	};
 
+	var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n';
+
 	// Define the configuration for all the tasks
 	grunt.initConfig({
 
 		// Project settings
+		pkg : require('./bower.json'),
 		yeoman : appConfig,
 
 		// Watches files for changes and runs tasks based on the changed files
@@ -143,13 +146,26 @@ module.exports = function (grunt) {
 					ext : '-withcookie.html'
 				} ]
 			}
-		}
+		},
 
+		usebanner : {
+			dist : {
+				options : {
+					position : 'top',
+					banner : banner,
+					linebreak : false
+				},
+				expand : true,
+				cwd : 'dist',
+				src : '*.js',
+				dest : 'dist'
+			}
+		}
 	});
 
 	grunt.registerTask('serve', 'Compile then start a connect web server', function () {
 		grunt.task.run([ 'clean:dev', 'targethtml', 'connect:livereload', 'watch' ]);
 	});
 
-	grunt.registerTask('default', [ 'clean:dist', 'jshint', 'concat:dist', 'removelogging:dist', 'uglify:dist' ]);
+	grunt.registerTask('default', [ 'clean:dist', 'jshint', 'concat:dist', 'removelogging:dist', 'uglify:dist', 'usebanner' ]);
 };

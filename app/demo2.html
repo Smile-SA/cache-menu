@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo2 : deferred initialization</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="demo.css" />
+</head>
+<body>
+	<div class="container">
+		<nav id="primaryNav">
+			<ul>
+				<li>
+					<a href="#">Link 1</a>
+					<!--(if target withoutCookie)> -->
+					
+					<!--<!(endif)-->
+				</li>
+				<li>
+					<a href="#">Link 2</a>
+					<!--(if target withoutCookie)> -->
+					
+					<!--<!(endif)-->
+				</li>
+				<li>
+					<a href="#">Link 3</a>
+					<!--(if target withoutCookie)> -->
+					
+					<!--<!(endif)-->
+				</li>
+			</ul>
+		</nav>
+	</div>
+	<script src="bower_components/modernizr/modernizr.js"></script>
+	<script src="bower_components/modernizr/feature-detects/cookies.js"></script>
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="src/docCookies.js"></script>
+	<script src="src/jquery-cache-menu.js"></script>
+	<script>
+		(function($){
+			$(document).ready(function(){
+				$('#primaryNav')
+					.on('menu-initialization-done', function(){
+						console.log('Menu is ready, go for its initialization');
+					})
+					.one('mouseenter', function(){
+						$(this).trigger('menu-initialization-todo');
+					})
+					.cacheMenu({
+						cookieInfo : {
+							name : 'skipMenuTransfer-demo2'
+						},
+						storageCacheName : 'menuToCache-demo2',
+						initAtStartup: false
+					})
+				;
+			});
+		}(jQuery));
+	</script>
+</body>
+</html>

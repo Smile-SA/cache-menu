@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo1</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="demo.css" />
+</head>
+<body>
+	<div class="container">
+		<nav id="primaryNav">
+			<ul>
+				<li>
+					<a href="#">Link 1</a>
+					<!--(if target withoutCookie)> -->
+					
+					<!--<!(endif)-->
+				</li>
+				<li>
+					<a href="#">Link 2</a>
+					<!--(if target withoutCookie)> -->
+					
+					<!--<!(endif)-->
+				</li>
+				<li>
+					<a href="#">Link 3</a>
+					<!--(if target withoutCookie)> -->
+					
+					<!--<!(endif)-->
+				</li>
+			</ul>
+		</nav>
+	</div>
+	<script src="bower_components/modernizr/modernizr.js"></script>
+	<script src="bower_components/modernizr/feature-detects/cookies.js"></script>
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="src/docCookies.js"></script>
+	<script src="src/jquery-cache-menu.js"></script>
+	<script>
+		(function($){
+			$(document).ready(function(){
+				$('#primaryNav')
+					.on('menu-initialization-done', function(){
+						console.log('Menu is ready, go for its initialization');
+					})
+					.cacheMenu({
+						cookieInfo : {
+							name : 'skipMenuTransfer-demo1'
+						},
+						storageCacheName : 'menuToCache-demo1'
+					})
+				;
+			});
+		}(jQuery));
+	</script>
+</body>
+</html>

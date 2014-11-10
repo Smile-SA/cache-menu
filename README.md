@@ -65,7 +65,7 @@ We want a plugin that :
 Of course, all of this, without modifying the plugin itself =)
 
 
-## Example flow with Manutan
+## Example flow
 
 Check the console to see the log flow.
 

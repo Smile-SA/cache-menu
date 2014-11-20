@@ -2,6 +2,7 @@
  * jQuery cache menu plugin
  * This plugin needs Modernizr with the 'cookies' and 'localStorage' detectors
  */
+// Macro behavior
 // if browser does not manage localstorage
 // // do nothing and stop
 // if not cookie
@@ -27,7 +28,10 @@
 			durationInSec : 3600,
 			path : '/'
 		},
-		storageCacheName : 'menuToCache',
+		storage : {
+			cacheName : 'menuToCache',
+			hashName : 'menuHash'
+		},
 		reloadOnError : true,
 		initAtStartup : true,
 		namespace : ''
@@ -43,7 +47,12 @@
 
 	Plugin.prototype.getStorageMenuItemName = function () {
 		var options = this.options;
-		return options.namespace + options.storageCacheName;
+		return options.namespace + options.storage.cacheName;
+	};
+
+	Plugin.prototype.getStorageMenuHashName = function () {
+		var options = this.options;
+		return options.namespace + options.storage.hashName;
 	};
 
 	Plugin.prototype.getCookieName = function () {
@@ -51,6 +60,16 @@
 		return options.namespace + options.cookieInfo.name;
 	};
 
+	/**
+	 * This workflow is triggered when there is no cookie set, that means when
+	 * the browser is officially virgin of all this plugin features.
+	 * 
+	 * Menu is retrieved from the HTML stream, also, a hash associated to the
+	 * menu is extracted. Both hash and menu data are stored into localstorage.
+	 * 
+	 * Finally an 'menu-initialization-done' event is triggered to allow user to
+	 * add their own logic.
+	 */
 	Plugin.prototype.manageWithoutCookie = function () {
 		console.log('[jquery-cache-menu] no cookie : disable initialisation trigger');
 		var $container = $(this.element);
@@ -58,16 +77,31 @@
 		console.log('[jquery-cache-menu] no cookie : get menu from webpage');
 		var options = this.options;
 		var cookieInfo = options.cookieInfo;
-		var menuToCache = $container.html();
+		// manage menu hash
+		var storageMenuHashName = this.getStorageMenuHashName();
+		var menuHash = $container.data().menuHash;
+		if (menuHash) {
+			console.log('[jquery-cache-menu] no cookie : store menu hash into localstorage');
+			window.localStorage.setItem(storageMenuHashName, menuHash);
+		}
 		var storageCacheName = this.getStorageMenuItemName();
+		// manage menu data
 		console.log('[jquery-cache-menu] no cookie : store menu into localstorage');
+		var menuToCache = $container.html();
 		window.localStorage.setItem(storageCacheName, menuToCache);
+		// set cookie
 		console.log('[jquery-cache-menu] no cookie : set cookie');
 		docCookies.setItem(this.getCookieName(), 1, cookieInfo.durationInSec, cookieInfo.path);
+		// internal initialization is done
 		console.log('[jquery-cache-menu] no cookie : trigger menu-initialization-done on container');
+		// trigger this event for business logic initialization
 		$container.trigger('menu-initialization-done');
 	};
 
+	/**
+	 * This workflow does nothing if lazy initialisation is set to true. If set
+	 * to false, it automatically trigger the internal initialization.
+	 */
 	Plugin.prototype.manageWithCookie = function () {
 		if (this.options.initAtStartup) {
 			console.log('[jquery-cache-menu] cookie and storage : init at startup');
@@ -75,9 +109,19 @@
 		}
 	};
 
+	/**
+	 * This workflow manage behavior while encountering an error.
+	 * 
+	 * Error can be having a cookie but no stored menu data which is
+	 * inconsistent. In that case, the cookie is removed and will be fixed at
+	 * the next page initialization.
+	 * 
+	 * Also, you may have the page reload if 'reloadOnError' is set to true. If
+	 * false, it does nothing.
+	 */
 	Plugin.prototype.errorWithCookie = function () {
-		console.log('[jquery-cache-menu] cookie but no storage : we have a problem !');
-		console.log('[jquery-cache-menu] cookie but no storage : remove cookie');
+		console.log('[jquery-cache-menu] errorWithCookie : we have a problem !');
+		console.log('[jquery-cache-menu] errorWithCookie : remove cookie');
 		var options = this.options;
 		var cookieInfo = options.cookieInfo;
 		var reloadOnError = options.reloadOnError;
@@ -85,7 +129,28 @@
 		if (reloadOnError) {
 			window.location.reload();
 		} else {
-			console.log('[jquery-cache-menu] cookie but no storage : reloadOnError is set to false, so that we will not do anything');
+			console.log('[jquery-cache-menu] errorWithCookie : reloadOnError is set to false, so that we will not do anything');
+		}
+	};
+
+	/**
+	 * If you're using menu hash (attribute data-menu-hash on the menu root
+	 * element), you can invalidate cache by providing a new hash.
+	 * 
+	 * If hash does not change from the previous value, there is no action.
+	 * 
+	 * If hashes are not the same, the error workflow is executed.
+	 */
+	Plugin.prototype.manageCacheValidity = function () {
+		var $container = $(this.element);
+		var newHash = $container.data().menuHash;
+		if (newHash) {
+			// check if menu is still valid
+			var oldHash = window.localStorage.getItem(this.getStorageMenuHashName());
+			if (newHash !== oldHash) {
+				console.log('[jquery-cache-menu] manageCacheValidity : hash are not the same', oldHash, newHash);
+				this.errorWithCookie();
+			}
 		}
 	};
 
@@ -123,6 +188,7 @@
 		if (!cookie) {
 			this.manageWithoutCookie();
 		} else {
+			this.manageCacheValidity();
 			cachedMenu = window.localStorage.getItem(this.getStorageMenuItemName());
 			if (!cachedMenu) {
 				this.errorWithCookie();

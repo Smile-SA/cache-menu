@@ -5,13 +5,15 @@ module.exports = function (grunt) {
 	var isAlreadyCacheForThisExample = function (cookie, url) {
 		// TODO complete this conf
 		var confs = {
-			'skipMenuTransfer-demo1' : 'demo1.html',
-			'skipMenuTransfer-demo2' : 'demo2.html'
+			'demo1.html' : 'demo1-skipMenuTransfer',
+			'demo2.html' : 'demo2-skipMenuTransfer',
+			'demo3-hash1.html' : 'demo3-skipMenuTransfer',
+			'demo3-hash2.html' : 'demo3-skipMenuTransfer'
 		};
 		var conf;
 		var result = false;
 		for (conf in confs) {
-			result = result || (cookie.indexOf(conf) !== -1 && url.indexOf(confs[conf]) !== -1);
+			result = result || (cookie.indexOf(confs[conf]) !== -1 && url.indexOf(conf) !== -1);
 		}
 		return result;
 	};

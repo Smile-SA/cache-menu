@@ -29,7 +29,8 @@
 		},
 		storageCacheName : 'menuToCache',
 		reloadOnError : true,
-		initAtStartup : true
+		initAtStartup : true,
+		namespace : ''
 	};
 
 	function Plugin (element, options) {
@@ -40,30 +41,47 @@
 		this.init();
 	}
 
-	var manageWithoutCookie = function ($container, cookieInfo, storageCacheName) {
+	Plugin.prototype.getStorageMenuItemName = function () {
+		var options = this.options;
+		return options.namespace + options.storageCacheName;
+	};
+
+	Plugin.prototype.getCookieName = function () {
+		var options = this.options;
+		return options.namespace + options.cookieInfo.name;
+	};
+
+	Plugin.prototype.manageWithoutCookie = function () {
 		console.log('[jquery-cache-menu] no cookie : disable initialisation trigger');
+		var $container = $(this.element);
 		$container.off('menu-initialization-todo');
 		console.log('[jquery-cache-menu] no cookie : get menu from webpage');
+		var options = this.options;
+		var cookieInfo = options.cookieInfo;
 		var menuToCache = $container.html();
+		var storageCacheName = this.getStorageMenuItemName();
 		console.log('[jquery-cache-menu] no cookie : store menu into localstorage');
 		window.localStorage.setItem(storageCacheName, menuToCache);
 		console.log('[jquery-cache-menu] no cookie : set cookie');
-		docCookies.setItem(cookieInfo.name, 1, cookieInfo.durationInSec, cookieInfo.path);
+		docCookies.setItem(this.getCookieName(), 1, cookieInfo.durationInSec, cookieInfo.path);
 		console.log('[jquery-cache-menu] no cookie : trigger menu-initialization-done on container');
 		$container.trigger('menu-initialization-done');
 	};
 
-	var manageWithCookie = function ($container, initAtStartup) {
-		if (initAtStartup) {
+	Plugin.prototype.manageWithCookie = function () {
+		if (this.options.initAtStartup) {
 			console.log('[jquery-cache-menu] cookie and storage : init at startup');
-			$container.trigger('menu-initialization-todo');
+			$(this.element).trigger('menu-initialization-todo');
 		}
 	};
 
-	var errorWithCookie = function (cookieInfo, reloadOnError) {
+	Plugin.prototype.errorWithCookie = function () {
 		console.log('[jquery-cache-menu] cookie but no storage : we have a problem !');
 		console.log('[jquery-cache-menu] cookie but no storage : remove cookie');
-		docCookies.removeItem(cookieInfo.name, cookieInfo.path);
+		var options = this.options;
+		var cookieInfo = options.cookieInfo;
+		var reloadOnError = options.reloadOnError;
+		docCookies.removeItem(this.getCookieName(), cookieInfo.path);
 		if (reloadOnError) {
 			window.location.reload();
 		} else {
@@ -71,46 +89,45 @@
 		}
 	};
 
-	Plugin.prototype = {
-		init : function () {
-			console.log('[jquery-cache-menu] init');
+	Plugin.prototype.init = function () {
+		console.log('[jquery-cache-menu] init');
 
-			var options = this.options;
-			var $container = $(this.element);
-			var cookie, cachedMenu;
-			var Modernizr = window.Modernizr;
+		var Modernizr = window.Modernizr;
 
-			if (!Modernizr.cookies) {
-				console.log('Cookies are not available, do nothing');
-				$container.trigger('menu-initialization-done');
-				return false;
-			}
+		if (!Modernizr.cookies) {
+			console.log('Cookies are not available, do nothing');
+			$container.trigger('menu-initialization-done');
+			return false;
+		}
 
-			if (!Modernizr.localstorage) {
-				console.log('Localstorage is not available, do nothing');
-				$container.trigger('menu-initialization-done');
-				return false;
-			}
+		if (!Modernizr.localstorage) {
+			console.log('Localstorage is not available, do nothing');
+			$container.trigger('menu-initialization-done');
+			return false;
+		}
 
-			$container.on('menu-initialization-todo', function () {
-				console.log('[jquery-cache-menu] menu-initialization-todo : get menu data from storage');
-				var cachedMenu = window.localStorage.getItem(options.storageCacheName);
-				console.log('[jquery-cache-menu] menu-initialization-todo : inject menu into webpage');
-				$container.html(cachedMenu);
-				console.log('[jquery-cache-menu] menu-initialization-todo : trigger menu-initialization-done on container');
-				$container.trigger('menu-initialization-done');
-			});
+		var $container = $(this.element);
+		var plugin = this;
+		$container.on('menu-initialization-todo', function () {
+			console.log('[jquery-cache-menu] menu-initialization-todo : get menu data from storage');
+			var cachedMenu = window.localStorage.getItem(plugin.getStorageMenuItemName());
+			console.log('[jquery-cache-menu] menu-initialization-todo : inject menu into webpage');
+			$container.html(cachedMenu);
+			console.log('[jquery-cache-menu] menu-initialization-todo : trigger menu-initialization-done on container');
+			$container.trigger('menu-initialization-done');
+		});
 
-			cookie = docCookies.getItem(options.cookieInfo.name);
-			if (!cookie) {
-				manageWithoutCookie($container, options.cookieInfo, options.storageCacheName);
+		var options = this.options;
+		var cachedMenu;
+		var cookie = docCookies.getItem(this.getCookieName());
+		if (!cookie) {
+			this.manageWithoutCookie();
+		} else {
+			cachedMenu = window.localStorage.getItem(this.getStorageMenuItemName());
+			if (!cachedMenu) {
+				this.errorWithCookie();
 			} else {
-				cachedMenu = window.localStorage.getItem(options.storageCacheName);
-				if (!cachedMenu) {
-					errorWithCookie(options.cookieInfo, options.reloadOnError);
-				} else {
-					manageWithCookie($container, options.initAtStartup);
-				}
+				this.manageWithCookie();
 			}
 		}
 	};

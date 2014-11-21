@@ -143,12 +143,16 @@ A new cookie is created for a 1h lifespan and for the path '/'.
 $elem.cacheMenu({
 	cookieInfo : { // cookie information that will transfer between back and frontend
 		name : 'skipMenuTransfer',
-		durationInSec : 3600, // in second
+		durationInSec : 60*60*24*365, // 1 year in second
 		path : '/' // perimeter
 	},
-	storageCacheName : 'menuToCache', // the menu will be saved in this localstorage key
+	storage : {
+		cacheName : 'menuToCache', // the menu will be saved in this localstorage key
+		hashName : 'menuHash' // the menu hash will be saved in this localstorage key
+	},
 	reloadOnError : true, // if anything go badly, the plugin purge its cache, you can have the page reload then
-	initAtStartup: true // set to false if you want to manage init manually
+	initAtStartup : true, // set to false if you want to manage init manually
+	namespace : '' // prefix for cookie name and storage keys
 });
 ```
 
@@ -192,6 +196,19 @@ Then, you'll need to trigger the 'menu-initialization-todo' event.
 ```
 
 Once initialization is done, the plugin will trigger the 'menu-initialization-done' event.
+
+### Deffered initialization
+
+By setting the 'data-menu-hash' on the element's root, you add a version information.
+
+```html
+<div class="myNavigation" data-menu-hash="azerty">
+	Menu to cache
+</div>
+```
+
+If another page is load with a different version (different hash value), then the cookie will be discarded and the next will process as there is no cache.
+In that case, it will refresh the cache.
 
 
 ## How to build the source

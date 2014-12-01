@@ -1,6 +1,6 @@
 {
   "name": "jquery-cache-menu",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "main": "./dist/jquery-cache-menu-min.js",
   "description": "Allow reducing html data transfered between client and server on recurring page call (while browsing a site)",
   "dependencies": {

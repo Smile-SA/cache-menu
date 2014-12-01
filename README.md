@@ -197,20 +197,6 @@ Then, you'll need to trigger the 'menu-initialization-todo' event.
 
 Once initialization is done, the plugin will trigger the 'menu-initialization-done' event.
 
-### Deffered initialization
-
-By setting the 'data-menu-hash' on the element's root, you add a version information.
-
-```html
-<div class="myNavigation" data-menu-hash="azerty">
-	Menu to cache
-</div>
-```
-
-If another page is load with a different version (different hash value), then the cookie will be discarded and the next will process as there is no cache.
-In that case, it will refresh the cache.
-
-
 ## How to build the source
 
 ### Test development

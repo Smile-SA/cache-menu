@@ -99,7 +99,7 @@ var docCookies = {
 	var defaults = {
 		cookieInfo : {
 			name : 'skipMenuTransfer',
-			durationInSec : 3600,
+			durationInSec : 60*60*24*365, // 1 year
 			path : '/'
 		},
 		storage : {
